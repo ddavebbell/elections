@@ -8,27 +8,11 @@ document.addEventListener("DOMContentLoaded", async function() {
 		let form = candidateForm(list, candidate)
 		let submit = submitInputTag(candidate)
 
-		form.addEventListener('submit', function(event){
-			$.ajax({
-				url: 'http://localhost:3000/votes',
-				method: 'POST',
-				dataType: 'JSON',
-				data: {id: this.querySelector('input[type=hidden]').value}
-			}).done(function(response){
-				console.log(`Vote submitted!`)
-			}).fail(function(response){
-				console.log('Voted Failed!')
-			})
-
-			window.location.href = 'index.html';
-		});
-
 		// Group and append the li
 		liTag.append(form);
 		form.append(submit);
 		createDivider(liTag)
 		list.append(liTag);
-
 
 		// hidden field
 		var hidden = document.createElement('input');
@@ -67,6 +51,22 @@ function candidateForm(list, candidate) {
 	form.setAttribute('method', 'POST');
 	form.setAttribute('action', '');
 	list.appendChild(form);
+
+	form.addEventListener('submit', function(event){
+		$.ajax({
+			url: 'http://localhost:3000/votes',
+			method: 'POST',
+			dataType: 'JSON',
+			data: {id: this.querySelector('input[type=hidden]').value}
+		}).done(function(response){
+			console.log(`Vote submitted!`)
+		}).fail(function(response){
+			console.log('Voted Failed!')
+		})
+
+		window.location.href = 'index.html';
+	});
+
 	return form;
 }
 
