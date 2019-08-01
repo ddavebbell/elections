@@ -1,49 +1,54 @@
-document.addEventListener("DOMContentLoaded", function() {
-	$.ajax({
-		url: 'https://enchanto-election.herokuapp.com',
+document.addEventListener("DOMContentLoaded", async function() {
+	let candidates = await fetchCandidates();
+	var list = document.querySelector('#list');
+
+	for (var i = 0; i < candidates.length; i++) {
+		const candidate = candidates[i]
+
+		// Prepare the necessary tags
+		let liTag = candidateLiTag(list, candidate)
+		let form = candidateForm(list, candidate)
+		let submit = submitInputTag(candidate)
+
+		// need to get this to work
+		submit.addEventListener('submit', function(event){
+			event.preventDefault();
+
+			console.log(
+				event
+			);
+		});
+
+		// Group and append the li
+		liTag.append(form);
+		form.append(submit);
+		createDivider(liTag)
+		list.append(liTag);
+
+
+		// hidden field
+		var hidden = document.createElement('input');
+		hidden.setAttribute('type', 'hidden');
+		hidden.setAttribute('name', 'id');
+		hidden.setAttribute('value', candidates[i].id);
+		form.insertAdjacentElement('beforeend', hidden);
+	};
+});
+
+async function fetchCandidates() {
+	let candidates;
+	await $.ajax({
+		url: 'http://localhost:3000',
 		method: 'GET',
 		dataType: 'JSON'
-	}).done(function(response){
-			var list = document.querySelector('#list');
-			const candidates = response.candidates;
-
-			for (var i = 0; i < candidates.length; i++) {
-				const candidate = candidates[i]
-				let liTag = candidateLiTag(list, candidate)
-				let form = candidateForm(list, candidate)
-
-				var button = document.createElement('button');
-				button.innerText = `Vote: ${candidates[i].name}`
-				button.setAttribute('type', 'submit');
-
-				// need to get this to work
-				button.addEventListener('submit', function(event){
-					event.preventDefault();
-
-					console.log(
-						event
-					);
-				});
-
-				liTag.append(form);
-				form.append(button);
-
-				createDivider(liTag)
-				list.append(liTag);
-
-
-				// hidden field
-				var hidden = document.createElement('input');
-				hidden.setAttribute('type', 'hidden');
-				hidden.setAttribute('name', 'name');
-				hidden.setAttribute('value', candidates[i].id);
-				form.insertAdjacentElement('beforeend', hidden);
- 			};
-
-	 }).fail( function() {
-		 alert('failed!!')
-	 });
-});
+	}).done(function(response) {
+		candidates = response.candidates;
+	}).fail(function(response) {
+		alert('failed!!')
+	})
+	console.log(candidates);
+	return candidates;
+}
 
 function candidateLiTag(list, candidate) {
 	let li = document.createElement('li');
@@ -67,3 +72,34 @@ function createDivider(liTag) {
 	divider.innerText = '+-----------------------+'
 	liTag.append(divider);
 }
+
+function submitInputTag(candidate) {
+	let submit = document.createElement('input');
+	submit.value = `Vote: ${candidate.name}`
+	submit.setAttribute('type', 'submit');
+	return submit;
+}
+
+// candidate = `<li>Name: ${response.candidates[i].name}<br>Votes: ${response.candidates[i].votes}
+// <form id="form${i}" action="POST" action=action="https://bb-election-api.herokuapp.com/vote">
+// <input type="submit" value="Vote!">
+// <input type="hidden" name=${response.candidates[i].name} value=${response.candidates[i].name}>
+// </form>
+// </li><br>`;
+// election.insertAdjacentHTML('beforeend',candidate)
+//
+// var forms = document.querySelectorAll('form')
+//
+// forms[i].addEventListener('submit',function(e){
+// 	e.preventDefault();
+// 	$.ajax({
+// 		url: 'https://bb-election-api.herokuapp.com/vote',
+// 		method: 'POST',
+// 		dataType: 'JSON',
+// 		data: {name: this.querySelector('input[type=hidden]').value}
+// 	}).done(function(){
+// 		console.log(`Vote submitted!`)
+// 	}).fail(function(){
+// 		console.log('Voted Failed!')
+// 	})
+// });
