@@ -4,19 +4,25 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 	for (var i = 0; i < candidates.length; i++) {
 		const candidate = candidates[i]
-
-		// Prepare the necessary tags
 		let liTag = candidateLiTag(list, candidate)
 		let form = candidateForm(list, candidate)
 		let submit = submitInputTag(candidate)
 
-		// need to get this to work
-		submit.addEventListener('submit', function(event){
-			event.preventDefault();
+		form.addEventListener('submit', function(event){
+			// event.preventDefault();
 
-			console.log(
-				event
-			);
+			$.ajax({
+				url: 'http://localhost:3000/votes',
+				method: 'POST',
+				dataType: 'JSON',
+				data: {id: this.querySelector('input[type=hidden]').value}
+			}).done(function(response){
+				console.log(`Vote submitted!`)
+			}).fail(function(response){
+				console.log('Voted Failed!')
+			})
+
+			window.location.href = 'index.html';
 		});
 
 		// Group and append the li
@@ -46,7 +52,6 @@ async function fetchCandidates() {
 	}).fail(function(response) {
 		alert('failed!!')
 	})
-	console.log(candidates);
 	return candidates;
 }
 
@@ -62,7 +67,7 @@ function candidateForm(list, candidate) {
 	let form = document.createElement('form');
 	form.className = 'vote';
 	form.setAttribute('method', 'POST');
-	form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes`);
+	form.setAttribute('action', '');
 	list.appendChild(form);
 	return form;
 }
@@ -70,7 +75,7 @@ function candidateForm(list, candidate) {
 function createDivider(liTag) {
 	let divider = document.createElement('p');
 	divider.innerText = '+-----------------------+'
-	liTag.append(divider);
+	liTag.appendChild(divider);
 }
 
 function submitInputTag(candidate) {
