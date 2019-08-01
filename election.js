@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", async function() {
-	let candidates = await fetchCandidates();
-	var list = document.querySelector('#list');
+	const candidates = await fetchCandidates();
+	const list = document.querySelector('#list');
 
 	for (var i = 0; i < candidates.length; i++) {
 		const candidate = candidates[i]
@@ -9,16 +9,14 @@ document.addEventListener("DOMContentLoaded", async function() {
 });
 
 function constructForm(list, candidate) {
-	let liTag = candidateLiTag(list, candidate)
-	let form = candidateForm(list, candidate)
-	let submit = submitInputTag(candidate)
-
+	let liTag = candidateLiTag(list, candidate);
+	let form = candidateForm(list, candidate);
+	let submit = submitInputTag(candidate);
 	liTag.append(form);
 	form.append(submit);
 	createDivider(liTag)
 	list.append(liTag);
-
-	hiddenField(form, candidate)
+	createHiddenField(form, candidate)
 }
 
 async function fetchCandidates() {
@@ -81,7 +79,7 @@ function submitInputTag(candidate) {
 	return submit;
 }
 
-function hiddenField(form, candidate) {
+function createHiddenField(form, candidate) {
 	hidden = document.createElement('input');
 	hidden.setAttribute('type', 'hidden');
 	hidden.setAttribute('name', 'id');
