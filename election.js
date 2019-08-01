@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 				var button = document.createElement('button');
 				button.innerText = `Vote: ${candidates[i].name}`
+				button.setAttribute('type', 'submit');
 
 				// need to get this to work
 				button.addEventListener('submit', function(event){
@@ -24,14 +25,10 @@ document.addEventListener("DOMContentLoaded", function() {
 					);
 				});
 
-
-				button.setAttribute('type', 'submit');
 				liTag.append(form);
 				form.append(button);
 
-				let bottomThing = document.createElement('p');
-				bottomThing.innerText = '+-----------------------+'
-				liTag.append(bottomThing);
+				createDivider(liTag)
 				list.append(liTag);
 
 
@@ -60,7 +57,13 @@ function candidateForm(list, candidate) {
 	let form = document.createElement('form');
 	form.className = 'vote';
 	form.setAttribute('method', 'POST');
-	form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes?id=${candidate.id}`);
+	form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes`);
 	list.appendChild(form);
 	return form;
+}
+
+function createDivider(liTag) {
+	let divider = document.createElement('p');
+	divider.innerText = '+-----------------------+'
+	liTag.append(divider);
 }
