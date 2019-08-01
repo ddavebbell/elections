@@ -1,67 +1,88 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
+	const candidates = await fetchCandidates();
+	const list = document.querySelector('#list');
 
-	$.ajax({
-		url: 'https://enchanto-election.herokuapp.com',
+	for (var i = 0; i < candidates.length; i++) {
+		const candidate = candidates[i]
+		constructForm(list, candidate)
+	};
+});
+
+function constructForm(list, candidate) {
+	let liTag = candidateLiTag(list, candidate);
+	let form = candidateForm(list, candidate);
+	let submit = submitInputTag(candidate);
+	liTag.append(form);
+	form.append(submit);
+	createDivider(liTag)
+	list.append(liTag);
+	createHiddenField(form, candidate)
+}
+
+async function fetchCandidates() {
+	let candidates;
+	await $.ajax({
+		url: 'http://localhost:3000',
 		method: 'GET',
 		dataType: 'JSON'
-	}).done(function(candidates){
-			var list = document.querySelector('#list');
-			for (var i = 0; i < candidates.candidates.length; i++) {
+	}).done(function(response) {
+		candidates = response.candidates;
+	}).fail(function(response) {
+		alert('failed!!')
+	})
+	return candidates;
+}
 
-				let liTag = document.createElement('li');
-				liTag.className = 'candidate'
-				liTag.innerHTML = '<p>Name: <b>' + candidates.candidates[i].name + '</b></p><p>Votes: ' + candidates.candidates[i].votes + '</p>'
-					list.appendChild(liTag);
+function candidateLiTag(list, candidate) {
+	let li = document.createElement('li');
+	li.className = 'candidate'
+	li.innerHTML = `<p>Name: <b>${candidate.name}</b></p><p>Votes: ${candidate.votes}</p>`
+	list.appendChild(li);
+	return li;
+}
 
-				// Voting form and button
-				var form = document.createElement('form');
-				form.className = 'vote';
-				form.setAttribute('method', 'POST');
-				form.setAttribute('action', 'https://enchanto-election.herokuapp.com/votes?name=');
-					list.appendChild(form);
+function candidateForm(list, candidate) {
+	let form = document.createElement('form');
+	form.className = 'vote';
+	form.setAttribute('method', 'POST');
+	form.setAttribute('action', '');
+	list.appendChild(form);
 
-				var button = document.createElement('button');
-				button.innerText = `Vote: ${candidates.candidates[i].name}`
+	form.addEventListener('submit', function(event){
+		$.ajax({
+			url: 'http://localhost:3000/votes',
+			method: 'POST',
+			dataType: 'JSON',
+			data: {id: this.querySelector('input[type=hidden]').value}
+		}).done(function(response){
+			console.log(`Vote submitted!`)
+		}).fail(function(response){
+			console.log('Voted Failed!')
+		})
 
-// need to get this to work
-				button.addEventListener('submit', function(event){
-					event.preventDefault();
+		window.location.href = 'index.html';
+	});
 
-					console.log(
-						event
-					);
+	return form;
+}
 
-				});
+function createDivider(liTag) {
+	let divider = document.createElement('p');
+	divider.innerText = '+-----------------------+'
+	liTag.appendChild(divider);
+}
 
+function submitInputTag(candidate) {
+	let submit = document.createElement('input');
+	submit.value = `Vote: ${candidate.name}`
+	submit.setAttribute('type', 'submit');
+	return submit;
+}
 
-				button.setAttribute('type', 'submit');
-				liTag.append(form);
-				form.append(button);
-
-				let bottomThing = document.createElement('p');
-				bottomThing.innerText = '+-----------------------+'
-				liTag.append(bottomThing);
-				list.append(liTag);
-
-
-				// hidden field
-				var hidden = document.createElement('input');
-				hidden.setAttribute('type', 'hidden');
-				hidden.setAttribute('name', 'name');
-				hidden.setAttribute('value', candidates.candidates[i].id);
-				form.insertAdjacentElement('beforeend', hidden);
- 			};
-
-	 }).fail( function() {
-		 alert('failed!!')
-	 });
-
-
-
-
-	//  $.ajax({
-  // url: "https://enchanto-election.herokuapp.com/votes?id=",
-  // type: "POST",
-  // success: function(candidate) {
-
-});
+function createHiddenField(form, candidate) {
+	hidden = document.createElement('input');
+	hidden.setAttribute('type', 'hidden');
+	hidden.setAttribute('name', 'id');
+	hidden.setAttribute('value', candidate.id);
+	form.insertAdjacentElement('beforeend', hidden);
+}
