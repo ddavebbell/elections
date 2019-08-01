@@ -4,24 +4,22 @@ document.addEventListener("DOMContentLoaded", async function() {
 
 	for (var i = 0; i < candidates.length; i++) {
 		const candidate = candidates[i]
-		let liTag = candidateLiTag(list, candidate)
-		let form = candidateForm(list, candidate)
-		let submit = submitInputTag(candidate)
-
-		// Group and append the li
-		liTag.append(form);
-		form.append(submit);
-		createDivider(liTag)
-		list.append(liTag);
-
-		// hidden field
-		var hidden = document.createElement('input');
-		hidden.setAttribute('type', 'hidden');
-		hidden.setAttribute('name', 'id');
-		hidden.setAttribute('value', candidates[i].id);
-		form.insertAdjacentElement('beforeend', hidden);
+		constructForm(list, candidate)
 	};
 });
+
+function constructForm(list, candidate) {
+	let liTag = candidateLiTag(list, candidate)
+	let form = candidateForm(list, candidate)
+	let submit = submitInputTag(candidate)
+
+	liTag.append(form);
+	form.append(submit);
+	createDivider(liTag)
+	list.append(liTag);
+
+	hiddenField(form, candidate)
+}
 
 async function fetchCandidates() {
 	let candidates;
@@ -81,4 +79,12 @@ function submitInputTag(candidate) {
 	submit.value = `Vote: ${candidate.name}`
 	submit.setAttribute('type', 'submit');
 	return submit;
+}
+
+function hiddenField(form, candidate) {
+	hidden = document.createElement('input');
+	hidden.setAttribute('type', 'hidden');
+	hidden.setAttribute('name', 'id');
+	hidden.setAttribute('value', candidate.id);
+	form.insertAdjacentElement('beforeend', hidden);
 }
