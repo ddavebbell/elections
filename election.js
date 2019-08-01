@@ -1,36 +1,33 @@
 document.addEventListener("DOMContentLoaded", function() {
-
 	$.ajax({
 		url: 'https://enchanto-election.herokuapp.com',
 		method: 'GET',
 		dataType: 'JSON'
-	}).done(function(candidates){
+	}).done(function(response){
 			var list = document.querySelector('#list');
-			for (var i = 0; i < candidates.candidates.length; i++) {
+			const candidates = response.candidates;
 
-				let liTag = document.createElement('li');
-				liTag.className = 'candidate'
-				liTag.innerHTML = '<p>Name: <b>' + candidates.candidates[i].name + '</b></p><p>Votes: ' + candidates.candidates[i].votes + '</p>'
-					list.appendChild(liTag);
+			for (var i = 0; i < candidates.length; i++) {
+				const candidate = candidates[i]
+				let liTag = createCandidateLiTag(list, candidate)
 
 				// Voting form and button
 				var form = document.createElement('form');
 				form.className = 'vote';
 				form.setAttribute('method', 'POST');
-				form.setAttribute('action', 'https://enchanto-election.herokuapp.com/votes?name=');
-					list.appendChild(form);
+				form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes?id=${candidates[i].id}`);
+				list.appendChild(form);
 
 				var button = document.createElement('button');
-				button.innerText = `Vote: ${candidates.candidates[i].name}`
+				button.innerText = `Vote: ${candidates[i].name}`
 
-// need to get this to work
+				// need to get this to work
 				button.addEventListener('submit', function(event){
 					event.preventDefault();
 
 					console.log(
 						event
 					);
-
 				});
 
 
@@ -48,20 +45,19 @@ document.addEventListener("DOMContentLoaded", function() {
 				var hidden = document.createElement('input');
 				hidden.setAttribute('type', 'hidden');
 				hidden.setAttribute('name', 'name');
-				hidden.setAttribute('value', candidates.candidates[i].id);
+				hidden.setAttribute('value', candidates[i].id);
 				form.insertAdjacentElement('beforeend', hidden);
  			};
 
 	 }).fail( function() {
 		 alert('failed!!')
 	 });
-
-
-
-
-	//  $.ajax({
-  // url: "https://enchanto-election.herokuapp.com/votes?id=",
-  // type: "POST",
-  // success: function(candidate) {
-
 });
+
+function createCandidateLiTag(list, candidate) {
+	let li = document.createElement('li');
+	li.className = 'candidate'
+	li.innerHTML = `<p>Name: <b>${candidate.name}</b></p><p>Votes: ${candidate.votes}</p>`
+	list.appendChild(li);
+	return li;
+}
