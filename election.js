@@ -9,14 +9,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 			for (var i = 0; i < candidates.length; i++) {
 				const candidate = candidates[i]
-				let liTag = createCandidateLiTag(list, candidate)
-
-				// Voting form and button
-				var form = document.createElement('form');
-				form.className = 'vote';
-				form.setAttribute('method', 'POST');
-				form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes?id=${candidates[i].id}`);
-				list.appendChild(form);
+				let liTag = candidateLiTag(list, candidate)
+				let form = candidateForm(list, candidate)
 
 				var button = document.createElement('button');
 				button.innerText = `Vote: ${candidates[i].name}`
@@ -54,10 +48,19 @@ document.addEventListener("DOMContentLoaded", function() {
 	 });
 });
 
-function createCandidateLiTag(list, candidate) {
+function candidateLiTag(list, candidate) {
 	let li = document.createElement('li');
 	li.className = 'candidate'
 	li.innerHTML = `<p>Name: <b>${candidate.name}</b></p><p>Votes: ${candidate.votes}</p>`
 	list.appendChild(li);
 	return li;
+}
+
+function candidateForm(list, candidate) {
+	let form = document.createElement('form');
+	form.className = 'vote';
+	form.setAttribute('method', 'POST');
+	form.setAttribute('action', `https://enchanto-election.herokuapp.com/votes?id=${candidate.id}`);
+	list.appendChild(form);
+	return form;
 }
